@@ -3,9 +3,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.pistonmc</groupId>
-    <artifactId>piston</artifactId>
+    <artifactId>stickypiston</artifactId>
     <version>1.0-SNAPSHOT</version>
-    <name>Piston</name>
+    <name>StickyPiston</name>
     <url>http://pistonmc.org</url>
 
     <properties>
@@ -13,9 +13,9 @@
     </properties>
 
     <scm>
-        <developerConnection>scm:git:git@github.com:StickyPiston/Piston.git</developerConnection>
-        <connection>scm:git:git://github.com/StickyPiston/Piston.git</connection>
-        <url>https://github.com/StickyPiston/Piston/tree/master/</url>
+        <developerConnection>scm:git:git@github.com:StickyPiston/StickyPiston.git</developerConnection>
+        <connection>scm:git:git://github.com/StickyPiston/StickyPiston.git</connection>
+        <url>https://github.com/StickyPiston/StickyPiston/tree/master/</url>
     </scm>
 
 
