@@ -1,11 +1,13 @@
 package org.pistonmc.stickypiston.network.protocol;
 
 import com.google.common.collect.Lists;
+import org.pistonmc.logging.Logger;
 import org.pistonmc.protocol.Client;
 import org.pistonmc.stickypiston.exception.protocol.ProtocolException;
 import org.pistonmc.stickypiston.exception.protocol.ProtocolNotFoundException;
 import org.pistonmc.stickypiston.plugin.PluginManager;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,12 +16,9 @@ public class ProtocolManager extends PluginManager<Protocol> {
 
     private Map<String, Protocol> protocols;
 
-    public ProtocolManager() {
+    public ProtocolManager(Logger logger, File folder) {
+        super(logger, folder, "protocol.json");
         protocols = new HashMap<>();
-    }
-
-    public void load() {
-
     }
 
     public List<Protocol> getProtocols() {
