@@ -34,7 +34,7 @@
     <dependencies>
         <dependency>
             <groupId>org.pistonmc</groupId>
-            <artifactId>piston-api</artifactId>
+            <artifactId>piston</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -58,21 +58,6 @@
             <groupId>net.sf.jopt-simple</groupId>
             <artifactId>jopt-simple</artifactId>
             <version>4.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>1.14-SNAPSHOT</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20131018</version>
         </dependency>
         <!-- Testing -->
         <dependency>

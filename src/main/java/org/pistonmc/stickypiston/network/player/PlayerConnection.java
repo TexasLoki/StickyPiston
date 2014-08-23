@@ -2,7 +2,7 @@ package org.pistonmc.stickypiston.network.player;
 
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
-import org.pistonmc.stickypiston.network.protocol.Protocol;
+import org.pistonmc.plugin.protocol.Protocol;
 
 public class PlayerConnection extends ChannelHandlerAdapter {
 

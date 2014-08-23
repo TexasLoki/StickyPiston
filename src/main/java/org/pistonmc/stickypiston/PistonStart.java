@@ -5,7 +5,7 @@ import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.pistonmc.logging.Logging;
-import org.pistonmc.stickypiston.network.protocol.Protocol;
+import org.pistonmc.plugin.protocol.Protocol;
 
 import java.io.File;
 import java.io.IOException;
