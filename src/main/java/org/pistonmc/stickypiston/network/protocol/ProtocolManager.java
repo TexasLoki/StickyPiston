@@ -4,12 +4,13 @@ import com.google.common.collect.Lists;
 import org.pistonmc.protocol.Client;
 import org.pistonmc.stickypiston.exception.protocol.ProtocolException;
 import org.pistonmc.stickypiston.exception.protocol.ProtocolNotFoundException;
+import org.pistonmc.stickypiston.plugin.PluginManager;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public abstract class ProtocolManager {
+public class ProtocolManager extends PluginManager<Protocol> {
 
     private Map<String, Protocol> protocols;
 
@@ -17,7 +18,9 @@ public abstract class ProtocolManager {
         protocols = new HashMap<>();
     }
 
-    public abstract void load();
+    public void load() {
+
+    }
 
     public List<Protocol> getProtocols() {
         return Lists.newArrayList(protocols.values());

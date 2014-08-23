@@ -1,8 +1,9 @@
 package org.pistonmc.stickypiston.network.protocol;
 
 import org.pistonmc.protocol.Client;
+import org.pistonmc.stickypiston.plugin.JavaPlugin;
 
-public abstract class Protocol {
+public abstract class Protocol extends JavaPlugin {
 
     private Client client;
 
