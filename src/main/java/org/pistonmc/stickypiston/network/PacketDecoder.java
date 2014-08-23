@@ -5,7 +5,9 @@ import io.netty.buffer.ByteBufInputStream;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
 import org.pistonmc.stickypiston.network.packet.PacketInputStream;
+import org.pistonmc.stickypiston.network.packet.UnreadPacket;
 
+import java.io.ByteArrayInputStream;
 import java.io.EOFException;
 import java.util.List;
 
@@ -24,9 +26,12 @@ public class PacketDecoder extends ReplayingDecoder<DecoderState> {
                 return;
             }
 
-
+            byte[] bytes = input.readBytes(length);
+            input = new PacketInputStream(new ByteArrayInputStream(bytes));
+            out.add(new UnreadPacket(length, input));
         } catch(EOFException ex) {
-
+            // display a message saying the player has disconnected
+            out.add(new UnreadPacket(-1, null));
         }
     }
 

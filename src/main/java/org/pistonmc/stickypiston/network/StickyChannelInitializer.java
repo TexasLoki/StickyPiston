@@ -7,7 +7,7 @@ public class StickyChannelInitializer extends ChannelInitializer<SocketChannel> 
 
     @Override
     public void initChannel(SocketChannel ch) throws Exception {
-        ch.pipeline().addLast()
+        ch.pipeline().addLast(new PacketDecoder());
     }
 
 }

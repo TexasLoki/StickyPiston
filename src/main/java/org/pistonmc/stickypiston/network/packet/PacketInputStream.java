@@ -55,13 +55,16 @@ public class PacketInputStream extends DataInputStream {
 		return varInt;
 	}
 
-	public byte[] readByteArray() throws IOException {
-		short length = readShort();
-		if(length < 0)
-			throw new IOException("Invalid array length");
-		byte[] data = new byte[length];
-		readFully(data);
-		return data;
+	public byte[] readBytes() throws IOException {
+		return readBytes(readShort());
 	}
+
+    public byte[] readBytes(int length) throws IOException {
+        if(length < 0)
+            throw new IOException("Invalid array length");
+        byte[] data = new byte[length];
+        readFully(data);
+        return data;
+    }
 
 }
