@@ -4,8 +4,8 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
-import org.pistonmc.stickypiston.network.packet.PacketInputStream;
-import org.pistonmc.stickypiston.network.packet.UnreadPacket;
+import org.pistonmc.protocol.stream.PacketInputStream;
+import org.pistonmc.protocol.packet.UnreadPacket;
 
 import java.io.ByteArrayInputStream;
 import java.io.EOFException;
