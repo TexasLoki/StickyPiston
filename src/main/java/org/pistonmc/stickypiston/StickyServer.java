@@ -33,7 +33,9 @@ public class StickyServer implements Server {
         this.events = new DefaultEventManager(logger);
 
         this.protocols.reload(false);
+        this.protocols.enable();
         this.plugins.reload(false);
+        this.plugins.enable();
 
         InetSocketAddress address = new InetSocketAddress((String) options.valueOf("bind-ip"), (Integer) options.valueOf("p"));
         this.network = new NetworkServer(address);
