@@ -44,11 +44,11 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
 
             protocol = Piston.getServer().getProtocolManager().find(handshake.getVersion(), this);
             state = handshake.getState();
-            return;
+        } else {
+            packet = protocol.create(state, unread.getId());
+            packet.read(unread);
         }
 
-        packet = protocol.create(state, unread.getId());
-        packet.read(unread);
         Piston.getEventManager().call(new ReceivedPacketEvent(packet));
     }
 
