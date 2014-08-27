@@ -13,7 +13,6 @@ import org.pistonmc.protocol.PlayerConnection;
 import org.pistonmc.protocol.packet.HandshakePacket;
 import org.pistonmc.protocol.packet.IncomingPacket;
 import org.pistonmc.protocol.packet.OutgoingPacket;
-import org.pistonmc.protocol.packet.Packet;
 import org.pistonmc.protocol.packet.ProtocolState;
 import org.pistonmc.protocol.packet.UnreadPacket;
 import org.pistonmc.protocol.stream.PacketOutputStream;

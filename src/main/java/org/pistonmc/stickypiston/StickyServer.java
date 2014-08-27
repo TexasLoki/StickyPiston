@@ -9,7 +9,6 @@ import org.pistonmc.logging.Logger;
 import org.pistonmc.logging.Logging;
 import org.pistonmc.plugin.JavaPlugin;
 import org.pistonmc.plugin.JavaPluginManager;
-import org.pistonmc.plugin.PluginManager;
 import org.pistonmc.plugin.protocol.ProtocolManager;
 import org.pistonmc.stickypiston.network.NetworkServer;
 import org.pistonmc.util.reflection.SimpleObject;
