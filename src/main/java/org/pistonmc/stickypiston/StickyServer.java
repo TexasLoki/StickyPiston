@@ -3,6 +3,8 @@ package org.pistonmc.stickypiston;
 import joptsimple.OptionSet;
 import org.pistonmc.Piston;
 import org.pistonmc.Server;
+import org.pistonmc.event.DefaultEventManager;
+import org.pistonmc.event.EventManager;
 import org.pistonmc.logging.Logger;
 import org.pistonmc.logging.Logging;
 import org.pistonmc.plugin.JavaPlugin;
@@ -19,6 +21,7 @@ public class StickyServer implements Server {
     private Logger logger;
     private ProtocolManager protocols;
     private JavaPluginManager plugins;
+    private EventManager events;
     private NetworkServer network;
 
     public StickyServer(OptionSet options) {
@@ -26,22 +29,31 @@ public class StickyServer implements Server {
         this.logger = Logging.getLogger();
         this.protocols = new ProtocolManager(Logging.getLogger("Protocol", logger), (File) options.valueOf("protocols-folder"));
         this.plugins = new JavaPluginManager(logger, (File) options.valueOf("plugins-folder"));
+        this.events = new DefaultEventManager(logger);
 
         this.protocols.reload(false);
         this.plugins.reload(false);
         this.network = new NetworkServer(null); // add ip address here
     }
 
+    @Override
     public Logger getLogger() {
         return logger;
     }
 
+    @Override
     public ProtocolManager getProtocolManager() {
         return protocols;
     }
 
-    public PluginManager getPluginManager() {
+    @Override
+    public JavaPluginManager getPluginManager() {
         return plugins;
+    }
+
+    @Override
+    public EventManager getEventManager() {
+        return events;
     }
 
     @Override
