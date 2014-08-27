@@ -33,6 +33,7 @@ public class NetworkServer extends Thread {
                 .option(ChannelOption.SO_BACKLOG, 128)
                 .childOption(ChannelOption.SO_KEEPALIVE, true);
 
+            System.out.println("Binding to " + address.getHostName() + ":" + address.getPort() + "...");
             ChannelFuture future = b.bind(address).sync();
             channel = future.channel().closeFuture();
         } catch(InterruptedException e) {

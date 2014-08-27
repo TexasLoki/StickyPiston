@@ -8,6 +8,7 @@ import org.pistonmc.protocol.packet.UnreadPacket;
 import org.pistonmc.protocol.stream.PacketInputStream;
 
 import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
 import java.io.EOFException;
 import java.util.List;
 
@@ -18,16 +19,17 @@ public class PacketDecoder extends ReplayingDecoder<DecoderState> {
         try {
             in.markReaderIndex();
 
-            PacketInputStream input = new PacketInputStream(new ByteBufInputStream(in));
+            PacketInputStream input = new PacketInputStream(new DataInputStream(new ByteBufInputStream(in)));
             int length = input.readVarInt();
 
             if(in.readableBytes() < length) {
                 in.resetReaderIndex();
+                out.add(new UnreadPacket(-1, null));
                 return;
             }
 
             byte[] bytes = input.readBytes(length);
-            input = new PacketInputStream(new ByteArrayInputStream(bytes));
+            input = new PacketInputStream(new DataInputStream(new ByteArrayInputStream(bytes)));
             out.add(new UnreadPacket(length, input));
         } catch(EOFException ex) {
             // display a message saying the player has disconnected

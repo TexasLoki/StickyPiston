@@ -30,7 +30,14 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        if(msg == null) {
+            return;
+        }
+
         UnreadPacket unread = (UnreadPacket) msg;
+        if(unread.getLength() == -1) {
+            return;
+        }
 
         IncomingPacket packet;
         if(state == HANDSHAKE) {
@@ -49,8 +56,8 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
             packet.read(unread);
         }
 
-        protocol.handle(packet);
         Piston.getEventManager().call(new ReceivedPacketEvent(packet));
+        protocol.handle(packet);
     }
 
     @Override
