@@ -10,7 +10,7 @@ import org.pistonmc.event.packet.SentPacketEvent;
 import org.pistonmc.exception.protocol.packet.PacketException;
 import org.pistonmc.plugin.protocol.Protocol;
 import org.pistonmc.protocol.PlayerConnection;
-import org.pistonmc.protocol.packet.packets.HandshakePacket;
+import org.pistonmc.protocol.packet.HandshakePacket;
 import org.pistonmc.protocol.packet.IncomingPacket;
 import org.pistonmc.protocol.packet.OutgoingPacket;
 import org.pistonmc.protocol.packet.ProtocolState;
