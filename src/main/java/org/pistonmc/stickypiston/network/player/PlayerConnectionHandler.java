@@ -17,7 +17,7 @@ import org.pistonmc.protocol.stream.PacketOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import static org.pistonmc.protocol.packet.ProtocolState.*;
+import static org.pistonmc.protocol.packet.ProtocolState.HANDSHAKE;
 
 public class PlayerConnectionHandler extends ChannelHandlerAdapter implements PlayerConnection {
 
