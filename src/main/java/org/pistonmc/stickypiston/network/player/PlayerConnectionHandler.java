@@ -10,7 +10,7 @@ import org.pistonmc.event.packet.SentPacketEvent;
 import org.pistonmc.exception.protocol.packet.PacketException;
 import org.pistonmc.plugin.protocol.Protocol;
 import org.pistonmc.protocol.PlayerConnection;
-import org.pistonmc.protocol.packet.HandshakePacket;
+import org.pistonmc.protocol.packet.packets.HandshakePacket;
 import org.pistonmc.protocol.packet.IncomingPacket;
 import org.pistonmc.protocol.packet.OutgoingPacket;
 import org.pistonmc.protocol.packet.ProtocolState;
@@ -49,6 +49,7 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
             packet.read(unread);
         }
 
+        protocol.handle(packet);
         Piston.getEventManager().call(new ReceivedPacketEvent(packet));
     }
 
@@ -84,6 +85,11 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
         context.writeAndFlush(buffer);
 
         Piston.getEventManager().call(new SentPacketEvent(packet));
+    }
+
+    @Override
+    public void close() {
+        context.close();
     }
 
 }
