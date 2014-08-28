@@ -1,5 +1,8 @@
 package org.pistonmc.stickypiston;
 
+import jline.TerminalFactory;
+import jline.console.ConsoleReader;
+import jline.console.completer.CompletionHandler;
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
@@ -13,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static org.pistonmc.util.OtherUtils.newList;
@@ -72,6 +76,31 @@ public class PistonStart {
         }
 
         new StickyServer(options, config).init();
+
+        try {
+            ConsoleReader console = new ConsoleReader();
+            console.setPrompt("> ");
+            console.setCompletionHandler(new CompletionHandler() {
+                @Override
+                public boolean complete(ConsoleReader reader, List<CharSequence> candidates, int position) throws IOException {
+                    Piston.getLogger().info(candidates);
+                    return false;
+                }
+            });
+
+            String line;
+            while((line = console.readLine()) != null) {
+                // command(line.split(" "));
+            }
+        } catch(IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                TerminalFactory.get().restore();
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
 }
