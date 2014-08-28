@@ -35,9 +35,9 @@ public class PistonStart {
         OptionParser parser = new OptionParser();
         parser.acceptsAll(newList("h", "help"), "Show this help dialog.").forHelp();
         parser.acceptsAll(newList("debug"), "Whether to show debug messages")
-            .withRequiredArg().ofType(Boolean.class).defaultsTo(false).describedAs("Debug messages");
+            .withRequiredArg().ofType(Boolean.class).defaultsTo(config.getBoolean("settings.debug")).describedAs("Debug messages");
         parser.acceptsAll(newList("log-append"), "Whether to append to the log file")
-            .withRequiredArg().ofType(Boolean.class).defaultsTo(config.getBoolean("settings.debug")).describedAs("Log append");
+            .withRequiredArg().ofType(Boolean.class).defaultsTo(true).describedAs("Log append");
         parser.acceptsAll(newList("o", "offline"), "Whether to enable offline mode")
             .withRequiredArg().ofType(Boolean.class).defaultsTo(config.getBoolean("settings.offline")).describedAs("Offline mode");
         parser.acceptsAll(newList("d", "date-format"), "Format of the date to display in the console")
@@ -71,7 +71,7 @@ public class PistonStart {
             return;
         }
 
-        new StickyServer(options).init();
+        new StickyServer(options, config).init();
     }
 
 }
