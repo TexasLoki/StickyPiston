@@ -4,3 +4,8 @@ settings:
   offline: false
   max-players: 20
   debug: false
+ping:
+  motd:
+  - '&bA Minecraft Server'
+  accessible: true
+  protocol: default
