@@ -28,15 +28,15 @@ public class NetworkServer extends Thread {
         try {
             ServerBootstrap b = new ServerBootstrap();
             b.group(boss, worker)
-                .channel(NioServerSocketChannel.class)
-                .childHandler(new StickyChannelInitializer())
-                .option(ChannelOption.SO_BACKLOG, 128)
-                .childOption(ChannelOption.SO_KEEPALIVE, true);
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new StickyChannelInitializer())
+                    .option(ChannelOption.SO_BACKLOG, 128)
+                    .childOption(ChannelOption.SO_KEEPALIVE, true);
 
             System.out.println("Binding to " + address.getHostName() + ":" + address.getPort() + "...");
             ChannelFuture future = b.bind(address).sync();
             channel = future.channel().closeFuture();
-        } catch(InterruptedException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
@@ -45,7 +45,7 @@ public class NetworkServer extends Thread {
         try {
             channel.sync();
             close();
-        } catch(InterruptedException ex) {
+        } catch (InterruptedException ex) {
             ex.printStackTrace();
         }
     }

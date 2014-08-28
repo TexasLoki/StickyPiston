@@ -11,17 +11,12 @@ import org.pistonmc.exception.protocol.packet.PacketException;
 import org.pistonmc.logging.Logging;
 import org.pistonmc.plugin.protocol.Protocol;
 import org.pistonmc.protocol.PlayerConnection;
-import org.pistonmc.protocol.packet.HandshakePacket;
-import org.pistonmc.protocol.packet.IncomingPacket;
-import org.pistonmc.protocol.packet.OutgoingPacket;
-import org.pistonmc.protocol.packet.ProtocolState;
-import org.pistonmc.protocol.packet.UnreadPacket;
+import org.pistonmc.protocol.packet.*;
 import org.pistonmc.protocol.stream.PacketOutputStream;
 import org.pistonmc.util.OtherUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.pistonmc.protocol.packet.ProtocolState.HANDSHAKE;
@@ -34,18 +29,18 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        if(msg == null) {
+        if (msg == null) {
             return;
         }
 
         UnreadPacket unread = (UnreadPacket) msg;
-        if(unread.getLength() == -1) {
+        if (unread.getLength() == -1) {
             return;
         }
 
         IncomingPacket packet;
-        if(state == HANDSHAKE) {
-            if(context == null) {
+        if (state == HANDSHAKE) {
+            if (context == null) {
                 context = ctx;
             }
 
@@ -74,7 +69,7 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
     public void sendPacket(OutgoingPacket packet) throws PacketException, IOException {
         SendPacketEvent event = new SendPacketEvent(packet);
         Piston.getEventManager().call(event);
-        if(event.isCancelled()) {
+        if (event.isCancelled()) {
             return;
         }
 
@@ -92,7 +87,7 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
         PacketOutputStream send = new PacketOutputStream(sendBuf); // create a new final byte array
 
         send.writeVarInt(dataBuf.toByteArray().length); // write the length of the buffer
-        for(byte b : dataBuf.toByteArray()) {
+        for (byte b : dataBuf.toByteArray()) {
             send.write(b); // write the array of bytes to the final byte array
         }
 

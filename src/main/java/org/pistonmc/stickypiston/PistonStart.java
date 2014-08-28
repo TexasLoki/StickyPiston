@@ -42,36 +42,36 @@ public class PistonStart {
         OptionParser parser = new OptionParser();
         parser.acceptsAll(newList("h", "help"), "Show this help dialog.").forHelp();
         parser.acceptsAll(newList("debug"), "Whether to show debug messages")
-            .withRequiredArg().ofType(Boolean.class).defaultsTo(config.getBoolean("settings.debug")).describedAs("Debug messages");
+                .withRequiredArg().ofType(Boolean.class).defaultsTo(config.getBoolean("settings.debug")).describedAs("Debug messages");
         parser.acceptsAll(newList("log-append"), "Whether to append to the log file")
-            .withRequiredArg().ofType(Boolean.class).defaultsTo(true).describedAs("Log append");
+                .withRequiredArg().ofType(Boolean.class).defaultsTo(true).describedAs("Log append");
         parser.acceptsAll(newList("o", "offline"), "Whether to enable offline mode")
-            .withRequiredArg().ofType(Boolean.class).defaultsTo(config.getBoolean("settings.offline")).describedAs("Offline mode");
+                .withRequiredArg().ofType(Boolean.class).defaultsTo(config.getBoolean("settings.offline")).describedAs("Offline mode");
         parser.acceptsAll(newList("d", "date-format"), "Format of the date to display in the console")
-            .withRequiredArg().ofType(SimpleDateFormat.class).defaultsTo(new SimpleDateFormat("HH:mm:ss")).describedAs("Log date format");
+                .withRequiredArg().ofType(SimpleDateFormat.class).defaultsTo(new SimpleDateFormat("HH:mm:ss")).describedAs("Log date format");
         parser.acceptsAll(newList("plugins-folder"), "The location for the plugins folder")
-            .withRequiredArg().ofType(File.class).defaultsTo(new File("plugins")).describedAs("Plugins folder");
+                .withRequiredArg().ofType(File.class).defaultsTo(new File("plugins")).describedAs("Plugins folder");
         parser.acceptsAll(newList("protocols-folder"), "The location for the protocols folder")
-            .withRequiredArg().ofType(File.class).defaultsTo(new File("protocols")).describedAs("Protocols folder");
+                .withRequiredArg().ofType(File.class).defaultsTo(new File("protocols")).describedAs("Protocols folder");
         parser.acceptsAll(newList("bind-ip"), "The address to bind the server to")
-            .withRequiredArg().ofType(String.class).defaultsTo(config.getString("host")).describedAs("Bind address");
+                .withRequiredArg().ofType(String.class).defaultsTo(config.getString("host")).describedAs("Bind address");
         parser.acceptsAll(newList("p", "port"), "The port to bind the server to")
-            .withRequiredArg().ofType(Integer.class).defaultsTo(config.getInteger("port")).describedAs("Bind port");
+                .withRequiredArg().ofType(Integer.class).defaultsTo(config.getInteger("port")).describedAs("Bind port");
         parser.acceptsAll(newList("max", "max-players"), "The maximum amount of players")
-            .withRequiredArg().ofType(Integer.class).defaultsTo(config.getInteger("settings.max-players")).describedAs("Maximum player count");
+                .withRequiredArg().ofType(Integer.class).defaultsTo(config.getInteger("settings.max-players")).describedAs("Maximum player count");
 
         OptionSet options;
         try {
             options = parser.parse(args);
-        } catch(OptionException ex) {
+        } catch (OptionException ex) {
             ex.printStackTrace();
             return;
         }
 
-        if(options.has("h")) {
+        if (options.has("h")) {
             try {
                 parser.printHelpOn(System.out);
-            } catch(IOException ex) {
+            } catch (IOException ex) {
                 Logging.getLogger().log("Could not display help: ", ex);
             }
 
@@ -94,15 +94,15 @@ public class PistonStart {
             });
 
             String line;
-            while((line = console.readLine()) != null) {
+            while ((line = console.readLine()) != null) {
                 Piston.getCommandRegistry().execute(line.split(" "), sender);
             }
-        } catch(IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
                 TerminalFactory.get().restore();
-            } catch(Exception e) {
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }

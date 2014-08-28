@@ -77,7 +77,7 @@ public class StickyServer implements Server {
     }
 
     public void shutdown() {
-        for(JavaPlugin plugin : plugins.getPlugins()) {
+        for (JavaPlugin plugin : plugins.getPlugins()) {
             plugin.setEnabled(false);
         }
     }
