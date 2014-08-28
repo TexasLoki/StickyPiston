@@ -57,7 +57,7 @@ public class PacketDecoder extends ReplayingDecoder<DecoderState> {
     @Override
     protected DecoderState state(DecoderState newState) {
         DecoderState oldState = super.state(newState);
-        Logging.getLogger().info("Changed state from " + oldState + " to " + newState);
+        // Logging.getLogger().info("Changed state from " + oldState + " to " + newState);
         return oldState;
     }
 
