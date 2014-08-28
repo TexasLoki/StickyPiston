@@ -8,6 +8,7 @@ import org.pistonmc.event.packet.ReceivedPacketEvent;
 import org.pistonmc.event.packet.SendPacketEvent;
 import org.pistonmc.event.packet.SentPacketEvent;
 import org.pistonmc.exception.protocol.packet.PacketException;
+import org.pistonmc.logging.Logging;
 import org.pistonmc.plugin.protocol.Protocol;
 import org.pistonmc.protocol.PlayerConnection;
 import org.pistonmc.protocol.packet.HandshakePacket;
@@ -16,9 +17,12 @@ import org.pistonmc.protocol.packet.OutgoingPacket;
 import org.pistonmc.protocol.packet.ProtocolState;
 import org.pistonmc.protocol.packet.UnreadPacket;
 import org.pistonmc.protocol.stream.PacketOutputStream;
+import org.pistonmc.util.OtherUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.pistonmc.protocol.packet.ProtocolState.HANDSHAKE;
 
@@ -49,6 +53,7 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
             packet = handshake;
             packet.read(unread);
 
+            Logging.getLogger().info("Read " + packet);
             protocol = Piston.getServer().getProtocolManager().find(handshake.getVersion(), this);
             state = handshake.getState();
         } else {
@@ -66,7 +71,6 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
         ctx.close();
     }
 
-    @Override
     public void sendPacket(OutgoingPacket packet) throws PacketException, IOException {
         SendPacketEvent event = new SendPacketEvent(packet);
         Piston.getEventManager().call(event);
@@ -75,23 +79,29 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
         }
 
         ByteArrayOutputStream array = new ByteArrayOutputStream();
-        PacketOutputStream out = new PacketOutputStream(array);
-        out.writeVarInt(packet.getId());
-        packet.write(out);
-
-        byte[] contents = array.toByteArray();
-        array = new ByteArrayOutputStream();
-        out = new PacketOutputStream(array);
-        out.writeVarInt(contents.length);
-        out.writeByteArray(contents);
-
-        contents = array.toByteArray();
-        ByteBuf buffer = context.alloc().buffer(contents.length);
-        buffer.writeBytes(contents);
-
-        context.writeAndFlush(buffer);
+        PacketOutputStream data = new PacketOutputStream(array);
+        data.writeVarInt(packet.getId()); // write the packet id
+        packet.write(data); // write the packet data
+        sendPacket(array);
 
         Piston.getEventManager().call(new SentPacketEvent(packet));
+    }
+
+    public void sendPacket(ByteArrayOutputStream dataBuf) throws IOException {
+        ByteArrayOutputStream sendBuf = new ByteArrayOutputStream();
+        PacketOutputStream send = new PacketOutputStream(sendBuf); // create a new final byte array
+
+        send.writeVarInt(dataBuf.toByteArray().length); // write the length of the buffer
+        for(byte b : dataBuf.toByteArray()) {
+            send.write(b); // write the array of bytes to the final byte array
+        }
+
+        ByteBuf buffer = context.alloc().buffer(sendBuf.toByteArray().length);
+        buffer.writeBytes(sendBuf.toByteArray());
+        context.writeAndFlush(buffer); // write the final array to the data output stream then flush the output and send it on it's way
+
+        List<Byte> list = OtherUtils.asList(sendBuf.toByteArray());
+        Logging.getLogger().debug("Sending " + list.size() + " bytes: " + list);
     }
 
     @Override
