@@ -3,6 +3,8 @@ package org.pistonmc.stickypiston;
 import joptsimple.OptionSet;
 import org.pistonmc.Piston;
 import org.pistonmc.Server;
+import org.pistonmc.commands.CommandRegistry;
+import org.pistonmc.commands.DefaultCommandRegistry;
 import org.pistonmc.configuration.file.Config;
 import org.pistonmc.event.DefaultEventManager;
 import org.pistonmc.event.EventManager;
@@ -26,6 +28,7 @@ public class StickyServer implements Server {
     private JavaPluginManager plugins;
     private EventManager events;
     private NetworkServer network;
+    private CommandRegistry commands;
 
     public StickyServer(OptionSet options, Config config) {
         new SimpleObject(null, Piston.class).field("server").set(this);
@@ -39,6 +42,8 @@ public class StickyServer implements Server {
         this.protocols.enable();
         this.plugins.reload(false);
         this.plugins.enable();
+
+        this.commands = new DefaultCommandRegistry();
 
         InetSocketAddress address = new InetSocketAddress((String) options.valueOf("bind-ip"), (Integer) options.valueOf("p"));
         this.network = new NetworkServer(address);
@@ -72,6 +77,10 @@ public class StickyServer implements Server {
         for(JavaPlugin plugin : plugins.getPlugins()) {
             plugin.setEnabled(false);
         }
+    }
+
+    public CommandRegistry getCommandRegistry() {
+        return commands;
     }
 
 }

@@ -7,6 +7,7 @@ import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.pistonmc.Piston;
+import org.pistonmc.commands.ConsoleCommandSender;
 import org.pistonmc.configuration.file.Config;
 import org.pistonmc.logging.Logging;
 import org.pistonmc.plugin.protocol.Protocol;
@@ -24,6 +25,7 @@ import static org.pistonmc.util.OtherUtils.newList;
 public class PistonStart {
 
     private static Map<String, Protocol> protocols;
+    private static ConsoleCommandSender sender;
 
     static {
         protocols = new HashMap<>();
@@ -77,6 +79,8 @@ public class PistonStart {
 
         new StickyServer(options, config).init();
 
+        sender = new ConsoleCommandSender();
+
         try {
             ConsoleReader console = new ConsoleReader();
             console.setPrompt("> ");
@@ -90,7 +94,7 @@ public class PistonStart {
 
             String line;
             while((line = console.readLine()) != null) {
-                // command(line.split(" "));
+                Piston.getCommandRegistry().execute(line.split(" "), sender);
             }
         } catch(IOException e) {
             e.printStackTrace();
