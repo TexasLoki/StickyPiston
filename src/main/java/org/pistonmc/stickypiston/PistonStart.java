@@ -11,6 +11,7 @@ import org.pistonmc.commands.ConsoleCommandSender;
 import org.pistonmc.configuration.file.Config;
 import org.pistonmc.logging.Logging;
 import org.pistonmc.plugin.protocol.Protocol;
+import org.pistonmc.stickypiston.exception.ExceptionHandler;
 import org.pistonmc.util.reflection.SimpleObject;
 
 import java.io.File;

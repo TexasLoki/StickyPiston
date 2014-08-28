@@ -13,6 +13,7 @@ import org.pistonmc.logging.Logging;
 import org.pistonmc.plugin.JavaPlugin;
 import org.pistonmc.plugin.JavaPluginManager;
 import org.pistonmc.plugin.protocol.ProtocolManager;
+import org.pistonmc.stickypiston.exception.ExceptionHandler;
 import org.pistonmc.stickypiston.network.NetworkServer;
 import org.pistonmc.util.reflection.SimpleObject;
 
@@ -37,6 +38,8 @@ public class StickyServer implements Server {
         this.protocols = new ProtocolManager(Logging.getLogger("Protocol", logger), (File) options.valueOf("protocols-folder"));
         this.plugins = new JavaPluginManager(logger, (File) options.valueOf("plugins-folder"));
         this.events = new DefaultEventManager(logger);
+
+        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
 
         this.protocols.reload(false);
         this.protocols.enable();
