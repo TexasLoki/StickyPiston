@@ -81,7 +81,7 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
         }
 
         Piston.getEventManager().call(new ReceivedPacketEvent(packet));
-        protocol.handle(packet);
+        protocol.handle(packet, ctx);
     }
 
     @Override
