@@ -4,17 +4,22 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
+import org.pistonmc.protocol.PlayerConnection;
 import org.pistonmc.protocol.packet.UnreadPacket;
 import org.pistonmc.protocol.stream.PacketInputStream;
+import org.pistonmc.util.EncryptionUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.EOFException;
+import java.io.InputStream;
 import java.util.List;
 
 public class PacketDecoder extends ReplayingDecoder<DecoderState> {
 
-    public PacketDecoder() {
+    private PlayerConnection connection;
+
+    public PacketDecoder(PlayerConnection connection) {
         state(DecoderState.LENGTH);
     }
 
@@ -28,7 +33,10 @@ public class PacketDecoder extends ReplayingDecoder<DecoderState> {
                 return;
             }
 
-            PacketInputStream input = new PacketInputStream(new DataInputStream(new ByteBufInputStream(in)));
+            DataInputStream streamInput = new DataInputStream(new ByteBufInputStream(in));
+            InputStream stream = connection.isSecured() ? EncryptionUtils.decryptInputStream(streamInput, connection.getSecretKey()) : streamInput;
+
+            PacketInputStream input = new PacketInputStream(stream);
             int length = input.readVarInt();
 
             if (in.readableBytes() < length) {

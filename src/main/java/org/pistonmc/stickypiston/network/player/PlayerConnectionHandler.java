@@ -16,10 +16,13 @@ import org.pistonmc.protocol.stream.PacketOutputStream;
 import org.pistonmc.stickypiston.auth.AuthenticationHandler;
 import org.pistonmc.stickypiston.auth.BungeeAuthenticationHandler;
 import org.pistonmc.stickypiston.auth.YggdrasilAuthenticationHandler;
+import org.pistonmc.util.EncryptionUtils;
 import org.pistonmc.util.OtherUtils;
 
+import javax.crypto.SecretKey;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.util.List;
 
@@ -30,6 +33,8 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
     private ProtocolState state = HANDSHAKE;
     private Protocol protocol;
     private ChannelHandlerContext context;
+    private SecretKey key;
+    private boolean secured;
 
     private AuthenticationHandler authenticationHandler;
 
@@ -90,6 +95,28 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
         ctx.close();
     }
 
+    @Override
+    public void secure(SecretKey key) {
+        this.key = key;
+        this.secured = true;
+    }
+
+    @Override
+    public void unsecure() {
+        this.key = null;
+        this.secured = false;
+    }
+
+    @Override
+    public boolean isSecured() {
+        return secured && key != null;
+    }
+
+    @Override
+    public SecretKey getSecretKey() {
+        return key;
+    }
+
     public AuthenticationHandler getAuthenticationHandler() {
         return authenticationHandler;
     }
@@ -102,7 +129,8 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
         }
 
         ByteArrayOutputStream array = new ByteArrayOutputStream();
-        PacketOutputStream data = new PacketOutputStream(array);
+        OutputStream stream = isSecured() ? EncryptionUtils.encryptOutputStream(array, key) : array;
+        PacketOutputStream data = new PacketOutputStream(stream);
         data.writeVarInt(packet.getId()); // write the packet id
         packet.write(data); // write the packet data
         sendPacket(array);
