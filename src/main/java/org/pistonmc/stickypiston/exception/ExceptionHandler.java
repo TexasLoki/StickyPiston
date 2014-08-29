@@ -9,6 +9,7 @@ public class ExceptionHandler implements Thread.UncaughtExceptionHandler {
     public void uncaughtException(Thread t, Throwable e) {
         if (e instanceof Exception) {
             Piston.getEventManager().call(new ExceptionCaughtEvent((Exception) e));
+            e.printStackTrace();
         }
     }
 

@@ -1,13 +1,16 @@
 package org.pistonmc.stickypiston.auth;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpEntity;
+import org.apache.http.HttpException;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.json.JSONObject;
 import org.pistonmc.Piston;
+import org.pistonmc.stickypiston.exception.ExceptionHandler;
 import org.pistonmc.util.OtherUtils;
 
 import java.io.IOException;
@@ -19,31 +22,44 @@ public class YggdrasilAuthenticationHandler implements AuthenticationHandler {
     private JSONObject playerProfile;
 
     public void auth(final String username, final String hash, final Callback cb) {
-        new Thread(new Runnable() {
+        Thread t = new Thread(new Runnable() {
 
             @Override
             public void run() {
                 CloseableHttpClient client = HttpClients.createDefault();
                 HttpGet request = new HttpGet("https://sessionserver.mojang.com/session/minecraft/hasJoined?username=" + username + "&serverId=" + hash);
+                CloseableHttpResponse response = null;
                 try {
-                    CloseableHttpResponse response = client.execute(request);
-                    HttpEntity body = response.getEntity();
-                    String json = IOUtils.toString(body.getContent());
-                    if (json == null || json.isEmpty()) {
+                    response = client.execute(request);
+                    String body = IOUtils.toString(response.getEntity().getContent());
+                    if (body == null || body.isEmpty()) {
                         cb.onExecute(false);
-                    } else {
-                        playerProfile = new JSONObject(json);
-                        playerUUID = OtherUtils.uuidFromString(playerProfile.getString("id"));
-                        cb.onExecute(true);
+                        return;
                     }
-                } catch (IOException e) {
-                    cb.onExecute(false);
+                    playerProfile = new JSONObject(body);
+                    playerUUID = OtherUtils.uuidFromString(playerProfile.getString("id"));
+                    cb.onExecute(true);
+                } catch (Exception e) {
                     Piston.getLogger().warning(e);
+                    cb.onExecute(false);
+                } finally {
+                    try {
+                        client.close();
+                        if (response != null) {
+                            response.close();
+                        }
+                    } catch (Exception e) {
+                        Piston.getLogger().warning(e);
+                        cb.onExecute(false);
+                    }
                 }
             }
 
-        }).start();
-        cb.onExecute(true);
+        });
+        t.setUncaughtExceptionHandler(new ExceptionHandler());
+        t.run();
+        // TODO: Make it async, because for some reason when I do t.start() it doesn't work
+        //t.start();
     }
 
     @Override
