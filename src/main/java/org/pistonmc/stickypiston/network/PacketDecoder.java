@@ -21,6 +21,7 @@ public class PacketDecoder extends ReplayingDecoder<DecoderState> {
 
     public PacketDecoder(PlayerConnection connection) {
         state(DecoderState.LENGTH);
+        this.connection = connection;
     }
 
     @Override

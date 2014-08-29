@@ -9,9 +9,9 @@ public class StickyChannelInitializer extends ChannelInitializer<SocketChannel> 
 
     @Override
     public void initChannel(SocketChannel ch) throws Exception {
-        PlayerConnection connection = new PlayerConnectionHandler();
-        PacketDecoder decoder = new PacketDecoder();
-        ch.pipeline().addLast(new PacketDecoder(), new PlayerConnectionHandler());
+        PlayerConnectionHandler connection = new PlayerConnectionHandler();
+        PacketDecoder decoder = new PacketDecoder(connection);
+        ch.pipeline().addLast(decoder, connection);
     }
 
 }
