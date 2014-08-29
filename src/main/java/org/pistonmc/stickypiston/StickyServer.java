@@ -32,7 +32,7 @@ public class StickyServer implements Server {
     private CommandRegistry commands;
 
     public StickyServer(OptionSet options, Config config) {
-        new SimpleObject(null, Piston.class).field("server").set(this);
+        new SimpleObject(Piston.class).field("server").set(this);
         this.logger = Logging.getLogger().setFormat((SimpleDateFormat) options.valueOf("d")).setDebug((boolean) options.valueOf("debug"));
         this.config = config;
         this.protocols = new ProtocolManager(Logging.getLogger("Protocol", logger), (File) options.valueOf("protocols-folder"));

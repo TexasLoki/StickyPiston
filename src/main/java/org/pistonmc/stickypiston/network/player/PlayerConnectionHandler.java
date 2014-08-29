@@ -61,21 +61,22 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
             packet = handshake;
             packet.read(unread);
 
-            /*if (Piston.getConfig().getBoolean("bungeecord")) {
+            if (Piston.getConfig().getBoolean("settings.bungeecord")) {
                 String[] split = handshake.getAddress().split("\00");
                 handshake.setAddress(split[0]);
                 playerIP = new InetSocketAddress(split[1], handshake.getPort());
 
                 authenticationHandler = new BungeeAuthenticationHandler();
-                boolean success = ((BungeeAuthenticationHandler) authenticationHandler).auth(handshake.getAddress().split("\00"));
+                boolean success = ((BungeeAuthenticationHandler) authenticationHandler).auth(split);
                 if (!success) {
                     // TODO: Kick player here
                     //protocol.sendPacket(new PacketLoginOutDisconnect("If you wish to use IP forwarding, please enable it in your BungeeCord config.", false));
                     ctx.close();
+                    return;
                 }
-            }*/
-
-            if (authenticationHandler == null) authenticationHandler = new YggdrasilAuthenticationHandler();
+            } else {
+                authenticationHandler = new YggdrasilAuthenticationHandler();
+            }
 
             Logging.getLogger().info("Read " + packet);
             protocol = Piston.getServer().getProtocolManager().find(handshake.getVersion(), this);

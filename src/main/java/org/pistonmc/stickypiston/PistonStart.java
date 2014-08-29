@@ -78,7 +78,8 @@ public class PistonStart {
             return;
         }
 
-        new StickyServer(options, config).init();
+        StickyServer server = new StickyServer(options, config);
+        server.init();
 
         sender = new ConsoleCommandSender();
 
