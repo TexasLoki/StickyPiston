@@ -4,6 +4,7 @@ settings:
   offline: false
   max-players: 20
   debug: false
+  bungeecord: false
 ping:
   motd:
   - '&bA Minecraft Server'

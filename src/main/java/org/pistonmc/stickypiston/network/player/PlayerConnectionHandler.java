@@ -13,10 +13,14 @@ import org.pistonmc.plugin.protocol.Protocol;
 import org.pistonmc.protocol.PlayerConnection;
 import org.pistonmc.protocol.packet.*;
 import org.pistonmc.protocol.stream.PacketOutputStream;
+import org.pistonmc.stickypiston.auth.AuthenticationHandler;
+import org.pistonmc.stickypiston.auth.BungeeAuthenticationHandler;
+import org.pistonmc.stickypiston.auth.YggdrasilAuthenticationHandler;
 import org.pistonmc.util.OtherUtils;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.List;
 
 import static org.pistonmc.protocol.packet.ProtocolState.HANDSHAKE;
@@ -26,6 +30,10 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
     private ProtocolState state = HANDSHAKE;
     private Protocol protocol;
     private ChannelHandlerContext context;
+
+    private AuthenticationHandler authenticationHandler;
+
+    private InetSocketAddress playerIP;
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -48,6 +56,22 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
             packet = handshake;
             packet.read(unread);
 
+            if (Piston.getConfig().getBoolean("bungeecord")) {
+                String[] split = handshake.getAddress().split("\00");
+                handshake.setAddress(split[0]);
+                playerIP = new InetSocketAddress(split[1], handshake.getPort());
+
+                authenticationHandler = new BungeeAuthenticationHandler();
+                boolean success = ((BungeeAuthenticationHandler) authenticationHandler).auth(handshake.getAddress().split("\00"));
+                if (!success) {
+                    // TODO: Kick player here
+                    //protocol.sendPacket(new PacketLoginOutDisconnect("If you wish to use IP forwarding, please enable it in your BungeeCord config.", false));
+                    ctx.close();
+                }
+            }
+
+            if (authenticationHandler == null) authenticationHandler = new YggdrasilAuthenticationHandler();
+
             Logging.getLogger().info("Read " + packet);
             protocol = Piston.getServer().getProtocolManager().find(handshake.getVersion(), this);
             state = handshake.getState();
@@ -64,6 +88,10 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         cause.printStackTrace();
         ctx.close();
+    }
+
+    public AuthenticationHandler getAuthenticationHandler() {
+        return authenticationHandler;
     }
 
     public void sendPacket(OutgoingPacket packet) throws PacketException, IOException {
