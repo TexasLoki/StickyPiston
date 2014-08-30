@@ -47,7 +47,7 @@ public class StickyEntity implements Entity {
         return valid;
     }
 
-    public static class StickyEntityBuilder extends Builder<StickyEntity> {
+    public static class StickyEntityBuilder implements Builder<StickyEntity> {
 
         @Override
         public StickyEntity build(BuilderArguments arguments) {

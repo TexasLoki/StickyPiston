@@ -6,6 +6,9 @@ import org.pistonmc.Server;
 import org.pistonmc.commands.CommandRegistry;
 import org.pistonmc.commands.DefaultCommandRegistry;
 import org.pistonmc.configuration.file.Config;
+import org.pistonmc.entity.Entity;
+import org.pistonmc.entity.builder.BuilderRegistry;
+import org.pistonmc.entity.builder.DefaultBuilderRegistry;
 import org.pistonmc.event.DefaultEventManager;
 import org.pistonmc.event.EventManager;
 import org.pistonmc.logging.Logger;
@@ -13,6 +16,7 @@ import org.pistonmc.logging.Logging;
 import org.pistonmc.plugin.JavaPlugin;
 import org.pistonmc.plugin.JavaPluginManager;
 import org.pistonmc.plugin.protocol.ProtocolManager;
+import org.pistonmc.stickypiston.entity.StickyEntity.StickyEntityBuilder;
 import org.pistonmc.stickypiston.exception.ExceptionHandler;
 import org.pistonmc.stickypiston.network.NetworkServer;
 import org.pistonmc.util.reflection.SimpleObject;
@@ -25,11 +29,12 @@ public class StickyServer implements Server {
 
     private Logger logger;
     private Config config;
+    private EventManager events;
     private ProtocolManager protocols;
     private JavaPluginManager plugins;
-    private EventManager events;
-    private NetworkServer network;
     private CommandRegistry commands;
+    private BuilderRegistry builders;
+    private NetworkServer network;
 
     public StickyServer(OptionSet options, Config config) {
         new SimpleObject(Piston.class).field("server").set(this);
@@ -47,13 +52,15 @@ public class StickyServer implements Server {
         this.plugins.enable();
 
         this.commands = new DefaultCommandRegistry();
+        this.builders = new DefaultBuilderRegistry();
 
         InetSocketAddress address = new InetSocketAddress((String) options.valueOf("bind-ip"), (Integer) options.valueOf("p"));
         this.network = new NetworkServer(address);
     }
 
     protected void init() {
-        this.network.start();
+        network.start();
+        builders.register(Entity.class, new StickyEntityBuilder());
     }
 
     public Logger getLogger() {
@@ -84,6 +91,10 @@ public class StickyServer implements Server {
 
     public CommandRegistry getCommandRegistry() {
         return commands;
+    }
+
+    public BuilderRegistry getBuilderRegistry() {
+        return builders;
     }
 
 }
