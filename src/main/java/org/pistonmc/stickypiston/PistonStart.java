@@ -3,12 +3,14 @@ package org.pistonmc.stickypiston;
 import jline.TerminalFactory;
 import jline.console.ConsoleReader;
 import jline.console.completer.CompletionHandler;
+import jline.internal.NonBlockingInputStream;
 import joptsimple.OptionException;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import org.pistonmc.Piston;
 import org.pistonmc.commands.ConsoleCommandSender;
 import org.pistonmc.configuration.file.Config;
+import org.pistonmc.logging.LogWriter;
 import org.pistonmc.logging.Logging;
 import org.pistonmc.plugin.protocol.Protocol;
 import org.pistonmc.stickypiston.exception.ExceptionHandler;
@@ -17,6 +19,7 @@ import org.pistonmc.util.reflection.SimpleObject;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,6 +28,7 @@ import static org.pistonmc.util.OtherUtils.newList;
 
 public class PistonStart {
 
+    private static LogWriter writer;
     private static Map<String, Protocol> protocols;
     private static ConsoleCommandSender sender;
 
@@ -35,6 +39,8 @@ public class PistonStart {
     public static void main(String[] args) {
         File file = new File(PistonStart.class.getProtectionDomain().getCodeSource().getLocation().getPath());
         new SimpleObject(Piston.class).field("jar").set(file);
+        writer = new LogWriter();
+        new SimpleObject(Logging.class).field("writer").set(writer);
 
         Config config = Config.loadFromRoot("server.yml");
         config.save();
@@ -84,7 +90,8 @@ public class PistonStart {
         sender = new ConsoleCommandSender();
 
         try {
-            ConsoleReader console = new ConsoleReader();
+            NonBlockingInputStream stream = new NonBlockingInputStream(System.in, true);
+            ConsoleReader console = new ConsoleReader(stream, System.out);
             console.setPrompt("> ");
             console.setCompletionHandler(new CompletionHandler() {
                 @Override
@@ -95,8 +102,16 @@ public class PistonStart {
             });
 
             String line;
-            while ((line = console.readLine()) != null) {
-                Piston.getCommandRegistry().execute(line.split(" "), sender);
+            while(true) {
+                for(Runnable runnable : writer.getRunnables()) {
+                    runnable.run();
+                }
+
+                writer.getRunnables().clear();
+                if(stream.available() >= 0) {
+                    line = console.readLine();
+                    Piston.getCommandRegistry().execute(line.split(" "), sender);
+                }
             }
         } catch (IOException e) {
             e.printStackTrace();

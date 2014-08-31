@@ -1,9 +1,5 @@
 package org.pistonmc.stickypiston;
 
-import com.evilco.mc.nbt.stream.NbtInputStream;
-import com.evilco.mc.nbt.tag.AbstractTag;
-import com.evilco.mc.nbt.tag.ITag;
-import com.evilco.mc.nbt.tag.TagCompound;
 import joptsimple.OptionSet;
 import org.pistonmc.Piston;
 import org.pistonmc.Server;
@@ -25,8 +21,6 @@ import org.pistonmc.stickypiston.entity.StickyEntity.StickyEntityBuilder;
 import org.pistonmc.stickypiston.exception.ExceptionHandler;
 import org.pistonmc.stickypiston.network.NetworkServer;
 import org.pistonmc.stickypiston.world.StickyWorldManager;
-import org.pistonmc.util.ClassUtils;
-import org.pistonmc.util.reflection.SimpleMethod;
 import org.pistonmc.util.reflection.SimpleObject;
 import org.pistonmc.world.Dimension;
 import org.pistonmc.world.World;
@@ -38,9 +32,6 @@ import java.net.InetSocketAddress;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.zip.DeflaterOutputStream;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.InflaterInputStream;
 
 public class StickyServer implements Server {
 
@@ -65,7 +56,7 @@ public class StickyServer implements Server {
         this.protocols = new ProtocolManager(Logging.getLogger("Protocol", logger), (File) options.valueOf("protocols-folder"));
         this.plugins = new JavaPluginManager(logger, (File) options.valueOf("plugins-folder"));
 
-        // Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
+        Thread.setDefaultUncaughtExceptionHandler(new ExceptionHandler());
 
         this.protocols.reload(false);
         this.plugins.reload(false);

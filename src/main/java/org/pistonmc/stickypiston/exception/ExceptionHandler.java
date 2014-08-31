@@ -9,8 +9,8 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
 
     @Override
     public void uncaughtException(Thread t, Throwable e) {
+        e.printStackTrace();
         if (e instanceof Exception) {
-            e.printStackTrace();
             Piston.getEventManager().call(new ExceptionCaughtEvent((Exception) e));
         }
     }
