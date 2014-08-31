@@ -5,8 +5,16 @@ settings:
   max-players: 20
   debug: false
   bungeecord: false
+  world-container: default
 ping:
   motd:
   - '&bA Minecraft Server'
   accessible: true
   protocol: default
+worlds:
+  world:
+    dimension: overworld
+  world_nether:
+    dimension: nether
+  world_the_end:
+    dimension: end
