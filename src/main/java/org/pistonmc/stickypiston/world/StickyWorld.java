@@ -3,9 +3,11 @@ package org.pistonmc.stickypiston.world;
 import com.evilco.mc.nbt.stream.NbtInputStream;
 import com.evilco.mc.nbt.tag.ITag;
 import com.evilco.mc.nbt.tag.TagCompound;
+import com.evilco.mc.nbt.tag.TagList;
 import org.pistonmc.Piston;
 import org.pistonmc.entity.Entity;
 import org.pistonmc.util.ClassUtils;
+import org.pistonmc.util.OtherUtils;
 import org.pistonmc.util.reflection.SimpleMethod;
 import org.pistonmc.util.reflection.SimpleObject;
 import org.pistonmc.world.Block;
@@ -13,6 +15,7 @@ import org.pistonmc.world.Chunk;
 import org.pistonmc.world.World;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,7 +105,23 @@ public class StickyWorld implements World {
     }
 
     private void display(ITag nbt) {
-        Piston.getLogger().debug(nbt.getName() + ": " + ClassUtils.build(nbt, true));
+        StringBuilder builder = new StringBuilder();
+        List<String> parents = new ArrayList<>();
+        ITag parent = nbt.getParent();
+        while(parent != null) {
+            parents.add(name(parent) + " - ");
+            parent = parent.getParent();
+        }
+
+        parents = OtherUtils.reverse(parents);
+        for(String name : parents) {
+            builder.append(name);
+        }
+
+        builder.append(name(nbt));
+        String name = builder.toString();
+
+        Piston.getLogger().debug(name + ": " + ClassUtils.build(nbt, true));
         if(nbt instanceof TagCompound) {
             TagCompound compound = (TagCompound) nbt;
             for(ITag tag : compound.getTags().values()) {
@@ -112,11 +131,24 @@ public class StickyWorld implements World {
             return;
         }
 
+        if(nbt instanceof TagList) {
+            TagList list = (TagList) nbt;
+            for(ITag tag : list.getTags()) {
+                display(tag);
+            }
+
+            return;
+        }
+
         SimpleObject object = new SimpleObject(nbt);
         SimpleMethod method = object.method("getValue");
         if(method != null) {
-            Piston.getLogger().debug(nbt.getName() + ": " + method.value());
+            Piston.getLogger().debug(name + ": " + method.value());
         }
+    }
+
+    private String name(ITag tag) {
+        return tag.getName() == null || tag.getName().equals("") ? "Unknown" : tag.getName();
     }
 
     private DataInputStream getChunkDataInputStream(int x, int z) {

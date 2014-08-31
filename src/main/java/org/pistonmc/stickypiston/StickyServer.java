@@ -29,6 +29,7 @@ import org.pistonmc.util.ClassUtils;
 import org.pistonmc.util.reflection.SimpleMethod;
 import org.pistonmc.util.reflection.SimpleObject;
 import org.pistonmc.world.Dimension;
+import org.pistonmc.world.World;
 import org.pistonmc.world.WorldBuilder;
 import org.pistonmc.world.WorldManager;
 
@@ -89,9 +90,14 @@ public class StickyServer implements Server {
                 continue;
             }
 
-            WorldBuilder builder = new WorldBuilder(name);
-            builder.folder(folder).dimension(dimension);
-            builder.create();
+            try {
+                WorldBuilder builder = new WorldBuilder(name);
+                builder.folder(folder).dimension(dimension);
+                World world = builder.create();
+                world.getChunk(0, 0);
+            } catch (Exception ex) {
+                getLogger().log("Could not load \"" + name + "\": ", ex);
+            }
 
             long finish = System.currentTimeMillis();
             double seconds = (double) (finish - start) / 1000;
