@@ -4,7 +4,7 @@ import joptsimple.OptionSet;
 import org.pistonmc.Piston;
 import org.pistonmc.Server;
 import org.pistonmc.commands.CommandRegistry;
-import org.pistonmc.commands.DefaultCommandRegistry;
+import org.pistonmc.stickypiston.commands.DefaultCommandRegistry;
 import org.pistonmc.configuration.ConfigurationSection;
 import org.pistonmc.configuration.file.Config;
 import org.pistonmc.entity.Entity;
@@ -17,9 +17,11 @@ import org.pistonmc.logging.Logging;
 import org.pistonmc.plugin.JavaPlugin;
 import org.pistonmc.plugin.JavaPluginManager;
 import org.pistonmc.plugin.protocol.ProtocolManager;
+import org.pistonmc.scheduler.PistonScheduler;
 import org.pistonmc.stickypiston.entity.StickyEntity.StickyEntityBuilder;
 import org.pistonmc.stickypiston.exception.ExceptionHandler;
 import org.pistonmc.stickypiston.network.NetworkServer;
+import org.pistonmc.stickypiston.scheduler.StickyScheduler;
 import org.pistonmc.stickypiston.world.StickyWorldManager;
 import org.pistonmc.util.reflection.SimpleObject;
 import org.pistonmc.world.Dimension;
@@ -32,10 +34,14 @@ import java.net.InetSocketAddress;
 import java.text.SimpleDateFormat;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class StickyServer implements Server {
 
     private long start;
+    private long tick;
+    private StickyScheduler scheduler;
 
     private Logger logger;
     private Config config;
@@ -50,6 +56,16 @@ public class StickyServer implements Server {
     public StickyServer(OptionSet options, Config config) {
         new SimpleObject(Piston.class).field("server").set(this);
         this.start = System.currentTimeMillis();
+        this.scheduler = new StickyScheduler(this);
+        this.tick = 0;
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                tick();
+            }
+        }, 0L, 1000/20);
+
         this.logger = Logging.getLogger().setFormat((SimpleDateFormat) options.valueOf("d")).setDebug((boolean) options.valueOf("debug"));
         this.config = config;
         this.events = new DefaultEventManager(logger);
@@ -122,6 +138,10 @@ public class StickyServer implements Server {
         return config;
     }
 
+    public PistonScheduler getScheduler() {
+        return scheduler;
+    }
+
     public EventManager getEventManager() {
         return events;
     }
@@ -150,6 +170,15 @@ public class StickyServer implements Server {
 
     public BuilderRegistry getBuilderRegistry() {
         return builders;
+    }
+
+    public long getTick() {
+        return tick;
+    }
+
+    public void tick() {
+        tick++;
+        scheduler.tick();
     }
 
 }
