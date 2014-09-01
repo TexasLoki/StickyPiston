@@ -163,6 +163,10 @@ public class StickyScheduler implements PistonScheduler {
     public void tick() {
         long tick = server.getTick();
         List<PistonTask> tasks = tickTasks.get(tick);
+        if(tasks == null) {
+            return;
+        }
+
         for(PistonTask task : tasks) {
             if(task.isCancelled()) {
                 task.run();
