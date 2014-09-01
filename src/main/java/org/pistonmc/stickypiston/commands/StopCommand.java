@@ -24,7 +24,12 @@ public class StopCommand implements Command {
 
     @Override
     public void onExecute(CommandArguments args, CommandSender sender) {
-        Piston.shutdown(args.getJoinedString());
+        String message = null;
+        if(args.length() > 0) {
+            message = args.getJoinedString();
+        }
+
+        Piston.shutdown(message);
     }
 
 }

@@ -173,6 +173,7 @@ public class StickyServer implements Server {
         }
         */
 
+        getLogger().warning("Shutting down server: " + message);
         for (JavaPlugin plugin : plugins.getPlugins()) {
             plugin.setEnabled(false);
         }
