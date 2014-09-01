@@ -24,15 +24,7 @@ public class StopCommand implements Command {
 
     @Override
     public void onExecute(CommandArguments args, CommandSender sender) {
-        /*
-        Player[] players = Piston.getOnlinePlayers();
-        String message = ChatColor.translate('&', args.getJoinedString());
-        for(Player player : players) {
-            player.kick(message);
-        }
-        */
-
-        Piston.shutdown();
+        Piston.shutdown(args.getJoinedString());
     }
 
 }

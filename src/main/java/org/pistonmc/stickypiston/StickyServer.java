@@ -1,9 +1,11 @@
 package org.pistonmc.stickypiston;
 
 import joptsimple.OptionSet;
+import org.pistonmc.ChatColor;
 import org.pistonmc.Piston;
 import org.pistonmc.Server;
 import org.pistonmc.commands.CommandRegistry;
+import org.pistonmc.plugin.protocol.Protocol;
 import org.pistonmc.stickypiston.commands.DefaultCommandRegistry;
 import org.pistonmc.configuration.ConfigurationSection;
 import org.pistonmc.configuration.file.Config;
@@ -162,6 +164,26 @@ public class StickyServer implements Server {
         for (JavaPlugin plugin : plugins.getPlugins()) {
             plugin.setEnabled(false);
         }
+    }
+
+    public void shutdown(String message) {
+        message = ChatColor.translate('&', message != null ? message : config.getString("settings.shutdown-message", "Server stopped"));
+        /*
+        Player[] players = Piston.getOnlinePlayers();
+        for(Player player : players) {
+            player.kick(message);
+        }
+        */
+
+        for (JavaPlugin plugin : plugins.getPlugins()) {
+            plugin.setEnabled(false);
+        }
+
+        for (Protocol protocol : protocols.getPlugins()) {
+            protocol.setEnabled(false);
+        }
+
+        System.exit(0);
     }
 
     public CommandRegistry getCommandRegistry() {
