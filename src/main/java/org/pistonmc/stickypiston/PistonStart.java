@@ -1,5 +1,6 @@
 package org.pistonmc.stickypiston;
 
+import io.netty.buffer.ByteBuf;
 import jline.TerminalFactory;
 import jline.console.ConsoleReader;
 import jline.console.completer.CompletionHandler;
@@ -19,10 +20,7 @@ import org.pistonmc.util.reflection.SimpleObject;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.pistonmc.util.OtherUtils.newList;
 
@@ -103,12 +101,17 @@ public class PistonStart {
 
             String line;
             while(true) {
-                for(Runnable runnable : writer.getRunnables()) {
-                    runnable.run();
-                }
+                List<Runnable> runnables = writer.getRunnables();
+                List<Runnable> complete = new ArrayList<>();
+                try {
+                    for(Runnable runnable : runnables) {
+                        runnable.run();
+                        complete.add(runnable);
+                    }
+                } catch (ConcurrentModificationException ignored) {}
 
-                writer.getRunnables().clear();
-                if(stream.available() >= 0) {
+                writer.getRunnables().removeAll(complete);
+                if(stream.available() > 0) {
                     line = console.readLine();
                     Piston.getCommandRegistry().execute(line.split(" "), sender);
                 }

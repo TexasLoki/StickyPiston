@@ -6,6 +6,7 @@ import org.pistonmc.Piston;
 import org.pistonmc.Server;
 import org.pistonmc.commands.CommandRegistry;
 import org.pistonmc.plugin.protocol.Protocol;
+import org.pistonmc.scheduler.PistonTask;
 import org.pistonmc.stickypiston.commands.DefaultCommandRegistry;
 import org.pistonmc.configuration.ConfigurationSection;
 import org.pistonmc.configuration.file.Config;
@@ -58,17 +59,17 @@ public class StickyServer implements Server {
     public StickyServer(OptionSet options, Config config) {
         new SimpleObject(Piston.class).field("server").set(this);
         this.start = System.currentTimeMillis();
+        this.logger = Logging.getLogger().setFormat((SimpleDateFormat) options.valueOf("d")).setDebug((boolean) options.valueOf("debug"));
         this.scheduler = new StickyScheduler(this);
         this.tick = 0;
         Timer timer = new Timer();
-        timer.scheduleAtFixedRate(new TimerTask() {
+        timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 tick();
             }
-        }, 0L, 1000/20);
+        }, 0L, 50);
 
-        this.logger = Logging.getLogger().setFormat((SimpleDateFormat) options.valueOf("d")).setDebug((boolean) options.valueOf("debug"));
         this.config = config;
         this.events = new DefaultEventManager(logger);
         this.protocols = new ProtocolManager(Logging.getLogger("Protocol", logger), (File) options.valueOf("protocols-folder"));
@@ -106,6 +107,7 @@ public class StickyServer implements Server {
                 world.getChunk(0, 0);
             } catch (Exception ex) {
                 getLogger().log("Could not load \"" + name + "\": ", ex);
+                continue;
             }
 
             long finish = System.currentTimeMillis();
@@ -182,7 +184,14 @@ public class StickyServer implements Server {
             protocol.setEnabled(false);
         }
 
-        System.exit(0);
+        PistonTask task = scheduler.create(null, new Runnable() {
+            @Override
+            public void run() {
+                getLogger().info("test shutting down");
+                System.exit(0);
+            }
+        }, 1, -1, false, true);
+        getLogger().info("Task #" + task.getId());
     }
 
     public CommandRegistry getCommandRegistry() {

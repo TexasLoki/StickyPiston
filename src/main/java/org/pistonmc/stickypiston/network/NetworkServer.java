@@ -6,6 +6,7 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import org.pistonmc.logging.Logging;
 
 import java.net.InetSocketAddress;
 
@@ -33,7 +34,7 @@ public class NetworkServer extends Thread {
                     .option(ChannelOption.SO_BACKLOG, 128)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
-            System.out.println("Binding to " + address.getHostName() + ":" + address.getPort() + "...");
+            Logging.getLogger().info("Binding to " + address.getHostName() + ":" + address.getPort() + "...");
             ChannelFuture future = b.bind(address).sync();
             channel = future.channel().closeFuture();
         } catch (InterruptedException e) {

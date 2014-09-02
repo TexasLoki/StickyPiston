@@ -24,8 +24,8 @@ public class StickyScheduler implements PistonScheduler {
         this.tickTasks = new ConcurrentHashMap<>();
     }
 
-    public PistonTask create(Plugin plugin, Runnable runnable, long delay, long period, boolean async) {
-        validate(plugin, runnable);
+    public PistonTask create(Plugin plugin, Runnable runnable, long delay, long period, boolean async, boolean force) {
+        validate(plugin, runnable, force);
 
         PistonTask task;
         if(async) {
@@ -45,6 +45,10 @@ public class StickyScheduler implements PistonScheduler {
 
         tasks.add(task);
         return task;
+    }
+
+    public PistonTask create(Plugin plugin, Runnable runnable, long delay, long period, boolean async) {
+        return create(plugin, runnable, delay, period, async, false);
     }
 
     public PistonTask run(Plugin plugin, Runnable runnable) {
@@ -155,8 +159,18 @@ public class StickyScheduler implements PistonScheduler {
         cancel(task);
     }
 
-    public void validate(Plugin plugin, Runnable runnable) {
-        Preconditions.checkNotNull(plugin, "Task owners cannot be null");
+    public void cancel(Plugin plugin) {
+        for(PistonTask task : tasks.values()) {
+            if(task.getOwner() != null && task.getOwner().equals(plugin)) {
+                task.cancel();
+            }
+        }
+    }
+
+    public void validate(Plugin plugin, Runnable runnable, boolean force) {
+        if (!force) {
+            Preconditions.checkNotNull(plugin, "Task owners cannot be null");
+        }
         Preconditions.checkNotNull(runnable, "Tasks cannot be null");
     }
 
@@ -167,6 +181,7 @@ public class StickyScheduler implements PistonScheduler {
             return;
         }
 
+        server.getLogger().info("Found " + tasks.size() + " tasks in " + tick);
         for(PistonTask task : tasks) {
             if(task.isCancelled()) {
                 task.run();
