@@ -3,6 +3,7 @@ package org.pistonmc.stickypiston.network.player;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.ChannelHandlerContext;
+import org.pistonmc.ChatColor;
 import org.pistonmc.Piston;
 import org.pistonmc.event.packet.ReceivedPacketEvent;
 import org.pistonmc.event.packet.SendPacketEvent;
@@ -24,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.List;
 
 import static org.pistonmc.protocol.packet.ProtocolState.HANDSHAKE;
@@ -36,9 +38,9 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
     private SecretKey key;
     private boolean secured;
 
-    private AuthenticationHandler authenticationHandler;
+    private AuthenticationHandler authenticator;
 
-    private InetSocketAddress playerIP;
+    private InetSocketAddress address;
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
@@ -55,6 +57,8 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
         if (state == HANDSHAKE) {
             if (context == null) {
                 context = ctx;
+                SocketAddress socket = ctx.channel().remoteAddress();
+                address = socket instanceof InetSocketAddress ? (InetSocketAddress) socket : null;
             }
 
             HandshakePacket handshake = new HandshakePacket();
@@ -62,20 +66,24 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
             packet.read(unread);
 
             if (Piston.getConfig().getBoolean("settings.bungeecord")) {
+                if(!handshake.getAddress().contains("\00")) {
+                    protocol.disconnect(ChatColor.RED + "This server only accepts BungeeCord clients");
+                }
+
                 String[] split = handshake.getAddress().split("\00");
                 handshake.setAddress(split[0]);
-                playerIP = new InetSocketAddress(split[1], handshake.getPort());
+                address = new InetSocketAddress(split[1], handshake.getPort());
 
-                authenticationHandler = new BungeeAuthenticationHandler();
-                boolean success = ((BungeeAuthenticationHandler) authenticationHandler).auth(split);
+                BungeeAuthenticationHandler auth = new BungeeAuthenticationHandler();
+                authenticator = auth;
+                boolean success = auth.auth(split);
                 if (!success) {
-                    // TODO: Kick player here
-                    //protocol.sendPacket(new PacketLoginOutDisconnect("If you wish to use IP forwarding, please enable it in your BungeeCord config.", false));
+                    protocol.disconnect("Failed to authenticate");
                     ctx.close();
                     return;
                 }
             } else {
-                authenticationHandler = new YggdrasilAuthenticationHandler();
+                authenticator = new YggdrasilAuthenticationHandler();
             }
 
             Logging.getLogger().info("Read " + packet);
@@ -96,30 +104,30 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
         ctx.close();
     }
 
-    @Override
+    public ProtocolState getState() {
+        return state;
+    }
+
     public void secure(SecretKey key) {
         this.key = key;
         this.secured = true;
     }
 
-    @Override
     public void unsecure() {
         this.key = null;
         this.secured = false;
     }
 
-    @Override
     public boolean isSecured() {
         return secured && key != null;
     }
 
-    @Override
     public SecretKey getSecretKey() {
         return key;
     }
 
-    public AuthenticationHandler getAuthenticationHandler() {
-        return authenticationHandler;
+    public AuthenticationHandler getAuthenticator() {
+        return authenticator;
     }
 
     public void sendPacket(OutgoingPacket packet) throws PacketException, IOException {
@@ -156,7 +164,6 @@ public class PlayerConnectionHandler extends ChannelHandlerAdapter implements Pl
         Logging.getLogger().debug("Sending " + list.size() + " bytes: " + list);
     }
 
-    @Override
     public void close() {
         context.close();
     }

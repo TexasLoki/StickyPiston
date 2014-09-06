@@ -62,12 +62,10 @@ public class YggdrasilAuthenticationHandler implements AuthenticationHandler {
         //t.start();
     }
 
-    @Override
     public UUID getUUID() {
         return playerUUID;
     }
 
-    @Override
     public JSONObject getPlayerProfile() {
         return playerProfile;
     }

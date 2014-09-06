@@ -16,17 +16,17 @@ public class BungeeAuthenticationHandler implements AuthenticationHandler {
             if (data.length == 4) {
                 playerProfile = new JSONObject(data[3]);
             }
+
             return true;
         }
+
         return false;
     }
 
-    @Override
     public UUID getUUID() {
         return playerUUID;
     }
 
-    @Override
     public JSONObject getPlayerProfile() {
         return playerProfile;
     }
