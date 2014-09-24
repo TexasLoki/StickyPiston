@@ -1,4 +1,4 @@
 Piston
 ======
 
-The Piston core server
+# No longer maintained due to other projects and a lack of interest
